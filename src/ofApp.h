@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGui.h"
+#include "Emitter.h"
 
 class ofApp : public ofBaseApp{
 
@@ -21,6 +23,17 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-		//hi
+		bool bHide;
 
+		ofxPanel gui;
+		ofxIntSlider complexityLevel;
+		ofColor textColor;
+
+		bool gameState;
+		float endTime;
+		float startTime;
+		int nEnergy;
+
+		Emitter emitter;
+		Sprite player;
 };
