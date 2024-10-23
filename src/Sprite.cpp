@@ -55,11 +55,13 @@ void Sprite::integrate() {
 	float framerate = ofGetFrameRate();
 	float dt = (framerate > 0) ? 1.0 / framerate : 0;
 
+	//move up/down (linear)
 	pos += velocity * dt;
 	acceleration = (1 / mass) * force;
 	velocity += acceleration * dt;
 	velocity *= damping;
 
+	//rotate (angular)
 	rot += angularVelocity * dt;
 	angularAcceleration = (1 / mass) * angularForce;
 	angularVelocity += angularAcceleration * dt;

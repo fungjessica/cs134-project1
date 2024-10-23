@@ -3,6 +3,9 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Emitter.h"
+#include <set>;
+
+//sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
 
 class ofApp : public ofBaseApp{
 
@@ -28,12 +31,16 @@ class ofApp : public ofBaseApp{
 		ofxPanel gui;
 		ofxIntSlider complexityLevel;
 		ofColor textColor;
+		ofxToggle playerToggle;
 
 		bool gameState;
 		float endTime;
 		float startTime;
 		int nEnergy;
+		bool playerSprite;
 
 		Emitter emitter;
 		Sprite player;
+
+		std::set<int> keysPressed;
 };

@@ -1,5 +1,7 @@
 #include "ofApp.h"
 
+
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 	bHide = false;
@@ -10,6 +12,7 @@ void ofApp::setup(){
 
 	gui.setup();
 	gui.add(complexityLevel.setup("Complexity Level", 1, 1, 3));
+	gui.add(playerToggle.setup("Player Sprite", false));
 	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 10);
 
 	emitter = Emitter();
@@ -17,6 +20,13 @@ void ofApp::setup(){
 	emitter.drawable = false;
 	emitter.spriteScale = 0.5;
 	emitter.start();
+
+	//player setup, default player sprite toggle, etc
+	playerSprite = false;
+	player.pos = glm::vec3(ofGetWidth() / 2.0, ofGetHeight() / 2.0, 0);
+
+	
+	
 }
 
 //--------------------------------------------------------------
@@ -33,7 +43,24 @@ void ofApp::update(){
 		}
 
 		// Write player methods here
-		
+		float screenWidth = ofGetScreenWidth();
+		float screenHeight = ofGetScreenHeight();
+
+		player.integrate();
+
+		if (player.pos.x > screenWidth) {
+			player.pos.x = 0;
+		}
+		if (player.pos.x < 0) {
+			player.pos.x = screenWidth;
+		}
+		if (player.pos.y > screenHeight) {
+			player.pos.y = 0;
+		}
+		if (player.pos.y < 0) {
+			player.pos.y = screenHeight;
+		}
+
 		// Boilerplate code for checking collisions (for images only rn)
 		// Work backward so that removing does not cause skipping
 		for (int i = emitter.sys->sprites.size() - 1; i > -1; i--) {
@@ -74,6 +101,8 @@ void ofApp::draw(){
 		ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 10, 20);
 		ofDrawBitmapString("Energy: " + ofToString(nEnergy) + "/" + ofToString(10), 10, 40);
 		ofDrawBitmapString("Time: " + ofToString(endTime - startTime), 10, 60);
+
+		player.draw();
 	} else {
 		ofBitmapFont font = ofBitmapFont();
 		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
@@ -82,10 +111,14 @@ void ofApp::draw(){
 		ofSetColor(textColor);
 		ofDrawBitmapString(text, ofGetWidth() / 2 - width / 2, ofGetHeight() / 2 - height / 2);
 	}
+
+
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+	keysPressed.insert(key);
+
 	switch (key) {
 	case 'h':
 		bHide = !bHide;
@@ -101,11 +134,29 @@ void ofApp::keyPressed(int key){
 		}
 		break;
 	}
+	
+	if (keysPressed.count(OF_KEY_LEFT)) {
+		player.angularForce -= 300.0f;
+	}
+	if (keysPressed.count(OF_KEY_RIGHT)) {
+		player.angularForce += 300.0f;
+	}
+	if (keysPressed.count(OF_KEY_UP)) {
+		float forceX = cos(glm::radians(player.rot)) * -500.0f;
+		float forceY = sin(glm::radians(player.rot)) * -500.0f;
+		player.force += glm::vec3(forceX, forceY, 0);
+		player.integrate();
+	}
+	if (keysPressed.count(OF_KEY_DOWN)) {
+		float forceX = cos(glm::radians(player.rot)) * 500.0f;
+		float forceY = sin(glm::radians(player.rot)) * 500.0f;
+		player.force += glm::vec3(forceX, forceY, 0);
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
+	keysPressed.erase(key);
 }
 
 //--------------------------------------------------------------
