@@ -16,6 +16,7 @@ void ofApp::setup(){
 	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 10);
 
 	emitter = Emitter();
+	agent = Sprite();
 	emitter.pos = glm::vec3(ofGetWindowWidth() / 2.0, ofGetWindowHeight() / 2.0, 0);
 	emitter.drawable = false;
 	emitter.spriteScale = 0.5;
@@ -47,6 +48,8 @@ void ofApp::update(){
 		float screenHeight = ofGetScreenHeight();
 
 		player.integrate();
+		emitter.update();
+		agent.integrate();
 
 		if (player.pos.x > screenWidth) {
 			player.pos.x = 0;
@@ -84,6 +87,8 @@ void ofApp::update(){
 			}
 
 			// Write agent updates down here (motion, etc.)
+
+
 		}
 	}
 }
@@ -103,6 +108,7 @@ void ofApp::draw(){
 		ofDrawBitmapString("Time: " + ofToString(endTime - startTime), 10, 60);
 
 		player.draw();
+		emitter.draw();
 	} else {
 		ofBitmapFont font = ofBitmapFont();
 		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
