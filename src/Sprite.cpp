@@ -55,18 +55,46 @@ void Sprite::integrate() {
 	float framerate = ofGetFrameRate();
 	float dt = (framerate > 0) ? 1.0 / framerate : 0;
 
-	//move up/down (linear)
-	pos += velocity * dt;
-	acceleration = (1 / mass) * force;
-	velocity += acceleration * dt;
-	velocity *= damping;
+    // --- Player Physics Integration ---
 
-	//rotate (angular)
-	rot += angularVelocity * dt;
-	angularAcceleration = (1 / mass) * angularForce;
-	angularVelocity += angularAcceleration * dt;
-	angularVelocity *= damping;
+    // Linear movement 
+    pos += velocity * dt;
+    acceleration = (1 / mass) * force;
+    velocity += acceleration * dt;
+    velocity *= damping;
 
-	force = glm::vec3(0, 0, 0);
-	angularForce = 0;
+    // Angular movement 
+    rot += angularVelocity * dt;
+    angularAcceleration = (1 / mass) * angularForce;
+    angularVelocity += angularAcceleration * dt;
+    angularVelocity *= damping;
+
+    // --- Agent Physics Integration ---
+
+    // Linear movement 
+    agentPos += agentVelocity;
+    agentAcceleration = (1 / mass) * agentForce;
+    agentVelocity += agentAcceleration * dt;
+    agentVelocity *= damping;
+
+    // Angular movement 
+    agentRot += agentAngularVelocity * dt;
+    agentAngularAcceleration = (1 / mass) * agentAngularForce;
+    agentAngularVelocity += agentAngularAcceleration * dt;
+    agentAngularVelocity *= damping;
+
+    // --- Forces towards player ---
+    float chaseSpeed = 100.0f;
+    glm::vec3 toPlayer = pos - agentPos;
+    glm::vec3 directionToPlayer = glm::normalize(toPlayer);
+    glm::vec3 chasingForce = directionToPlayer * chaseSpeed;
+    agentForce += chasingForce;
+
+   
+
+    // Reset forces
+    force = glm::vec3(0, 0, 0);
+    angularForce = 0;
+    agentForce = glm::vec3(0, 0, 0);
+    agentAngularForce = 0;
 }
