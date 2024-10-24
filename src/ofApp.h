@@ -41,6 +41,9 @@ class ofApp : public ofBaseApp{
 
 		Emitter emitter;
 		Sprite player;
+		Sprite agent;
 
 		std::set<int> keysPressed;
+
+
 };
