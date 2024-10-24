@@ -37,6 +37,7 @@ public:
 	glm::vec3 scale = glm::vec3(1, 1, 1);
 	float defaultSize = 20.0;
 
-	
+	glm::vec3 agentPos;
+	float agentRot = 0.0;
 	
 };
