@@ -2,36 +2,58 @@
 
 
 
+
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 	bHide = false;
 	gameState = false;
 	textColor = ofColor::white;
-	
+
 	nEnergy = 10;
 
 	gui.setup();
 	gui.add(complexityLevel.setup("Complexity Level", 1, 1, 3));
-	gui.add(playerToggle.setup("Player Sprite", false));
+	gui.add(playerToggleSprite.setup("Player Sprite", false));
+	gui.add(agentToggleSprite.setup("Agent Sprite", false));
+	gui.add(agentLifespan.setup("Agent Lifespan", 5, 1, 10));
+	gui.add(agentScale.setup("Agent Scale", 1, 1, 5));
+	gui.add(spawnRate.setup("Spawn Rate", 1, 1, 10));
+	gui.add(agentRotationSpeed.setup("Agent Rotation Speed", 3, 1, 10));
+	gui.add(agentSpeed.setup("Agent Speed", 1, 1, 10));
+
+	gui.add(playerScale.setup("Player Scale", 1, 1, 5));
+	gui.add(playerRotSpeed.setup("Player Rotation Speed", 5, 1, 10));
+	gui.add(playerSpeed.setup("Player Speed", 10, 1, 20));
+	gui.add(playerEnergy.setup("Player Energy", 10, 1, 15));
+	gui.add(toggleHeadingVector.setup("Toggle Heading Vector", false));
+
 	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 10);
 
 	emitter = Emitter();
-	agent = Sprite();
+	//agent = Sprite();
 	emitter.pos = glm::vec3(ofGetWindowWidth() / 2.0, ofGetWindowHeight() / 2.0, 0);
 	emitter.drawable = false;
 	emitter.spriteScale = 0.5;
-	emitter.start();
+
 
 	//player setup, default player sprite toggle, etc
 	playerSprite = false;
 	player.pos = glm::vec3(ofGetWidth() / 2.0, ofGetHeight() / 2.0, 0);
 
-	
-	
+
+	turtle.load("images/cs134_proj2_player.png");
+	player.setImage(turtle);
+
+	coconut.load("images/cs134_proj2_agent.png");
+	emitter.setChildImage(coconut);
+	emitter.start();
+
+	background.load("images/cs134 proj2 background.png");
+
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
 	if (gameState) {
 		// Handle complexity level
 		switch (complexityLevel) {
@@ -49,7 +71,6 @@ void ofApp::update(){
 
 		player.integrate();
 		emitter.update();
-		agent.integrate();
 
 		if (player.pos.x > screenWidth) {
 			player.pos.x = 0;
@@ -94,7 +115,10 @@ void ofApp::update(){
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
+	ofSetColor(255, 255, 255);
+	background.draw(0, 0, ofGetWidth(), ofGetHeight());
+
 	// Draw gui
 	if (!bHide)
 		gui.draw();
@@ -107,9 +131,30 @@ void ofApp::draw(){
 		ofDrawBitmapString("Energy: " + ofToString(nEnergy) + "/" + ofToString(10), 10, 40);
 		ofDrawBitmapString("Time: " + ofToString(endTime - startTime), 10, 60);
 
-		player.draw();
-		emitter.draw();
-	} else {
+
+		//toggle between triangle and turtle
+		if (playerToggleSprite) {
+			player.bShowImage = true;
+			ofSetColor(255, 255, 255);
+			player.draw();
+		}
+		else {
+			player.bShowImage = false;
+			player.draw();
+		}
+		if (agentToggleSprite) {
+			emitter.haveChildImage = true;
+			emitter.setChildImage(coconut);
+			emitter.draw();
+		}
+		else {
+			emitter.haveChildImage = false;
+			emitter.draw();
+		}
+
+
+	}
+	else {
 		ofBitmapFont font = ofBitmapFont();
 		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
 		int width = font.getBoundingBox(text, 0, 0).getWidth();
@@ -122,7 +167,7 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 	keysPressed.insert(key);
 
 	switch (key) {
@@ -140,7 +185,7 @@ void ofApp::keyPressed(int key){
 		}
 		break;
 	}
-	
+
 	if (keysPressed.count(OF_KEY_LEFT)) {
 		player.angularForce -= 300.0f;
 	}
@@ -161,51 +206,51 @@ void ofApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
+void ofApp::keyReleased(int key) {
 	keysPressed.erase(key);
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }
