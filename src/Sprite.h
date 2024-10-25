@@ -18,7 +18,7 @@ public:
 		verts.push_back(glm::vec3(20, 20, 0));
 		verts.push_back(glm::vec3(0, -20, 0));
 	}
-	
+
 	// some functions for highlighting when selected
 	//
 	void draw() {
@@ -55,7 +55,7 @@ public:
 	virtual void update() {}
 
 	bool insideTriangle(const glm::vec3 p);
-	
+
 
 	void setSelected(bool state) { bSelected = state; }
 	void setHighlight(bool state) { bHighlight = state; }
@@ -72,9 +72,11 @@ public:
 	float rotationSpeed = 0.0;
 	float birthtime = 0; // elapsed time in ms
 	float lifespan = -1;  //  time in ms
-	string name =  "UnammedSprite";
+	string name = "UnammedSprite";
 	float width = 40;
 	float height = 40;
+
+	float speed;
 
 	ofImage spriteImage;
 
@@ -93,13 +95,4 @@ public:
 	float angularForce = 0;
 	float mass = 1.0;
 	float damping = .99;
-
-	glm::vec3 agentVelocity = glm::vec3(5, 5, 0);
-	glm::vec3 agentAcceleration = glm::vec3(5, 5, 0);
-	glm::vec3 agentForce = glm::vec3(5, 5, 0);
-	float agentAngularVelocity = 0;
-	float agentAngularAcceleration = 0;
-	float agentTurnSpeed = 10.0f;
-	float agentAngularForce = 0;
 };
-
