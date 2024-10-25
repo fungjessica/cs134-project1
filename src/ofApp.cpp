@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 
-void ofApp::setComplexityDefault(int level) {
+void ofApp::setComplexityLevels(int level) {
 	switch (level) {
 	case 1: 
 		spawnRate = 1;
@@ -91,7 +91,7 @@ void ofApp::update() {
 
 		// Handle complexity level
 		if (complexityLevel != trackComplexity) {
-			setComplexityDefault(complexityLevel);
+			setComplexityLevels(complexityLevel);
 			trackComplexity = complexityLevel;
 
 			
