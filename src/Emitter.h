@@ -33,17 +33,17 @@ public:
 	void setImage(ofImage);
 	void setRate(float);
 	void update();
-	
+
 
 	// virtuals - can overloaded
-	virtual void moveSprite(Sprite *);
+	virtual void moveSprite(Sprite*);
 	virtual void spawnSprite();
 	virtual bool inside(glm::vec3 p) {
 		glm::vec3 s = glm::inverse(getTransform()) * glm::vec4(p, 1);
 		return (s.x > -width / 2 && s.x < width / 2 && s.y > -height / 2 && s.y < height / 2);
 	}
 
-	SpriteList *sys;
+	SpriteList* sys;
 	float rate;
 	glm::vec3 velocity;
 	float lifespan;
@@ -59,6 +59,5 @@ public:
 	ofColor color;
 	float spriteScale;
 	float spriteRotationSpeed;
-	int nAgents = 3;
+	int nAgents;
 };
-
