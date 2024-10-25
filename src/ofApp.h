@@ -7,8 +7,11 @@
 
 //sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
 
-
 class ofApp : public ofBaseApp {
+private:
+	void setComplexityDefault(int level);
+
+	int trackComplexity;
 
 public:
 	void setup();
@@ -31,8 +34,6 @@ public:
 
 	ofxPanel gui;
 	ofxIntSlider complexityLevel;
-	ofColor textColor;
-	ofxLabel screenSize;
 
 	//agent gui
 	ofxToggle agentToggleSprite;
@@ -40,7 +41,7 @@ public:
 	ofxFloatSlider spawnRate;
 	ofxFloatSlider agentScale;
 	ofxFloatSlider agentRotationSpeed = 3.0;
-	ofxFloatSlider nAgents = 1;
+	ofxIntSlider nAgents = 1;
 	ofxFloatSlider agentSpeed = 1.0;
 
 	//player gui
@@ -51,20 +52,25 @@ public:
 	ofxFloatSlider playerEnergy = 10.0f;
 	ofxToggle playerToggleSprite;
 
+	ofColor textColor;
+
 	bool gameState;
+	bool gameOver;
 	float endTime;
 	float startTime;
 	int nEnergy;
-	bool playerSprite = false;
+	bool playerSprite;
+	const int maxAgents = 5;
 
 	Emitter emitter;
 	Sprite player;
-	vector<Sprite> agents;
 
 	std::set<int> keysPressed;
 
-	ofImage turtle;
-	ofImage coconut;
 	ofImage background;
+	ofImage coconut;
+	ofImage turtle;
+	ofImage particle;
 
+	ofSoundPlayer munch;
 };
