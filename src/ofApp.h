@@ -7,43 +7,64 @@
 
 //sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
 
-class ofApp : public ofBaseApp{
 
-	public:
-		void setup();
-		void update();
-		void draw();
+class ofApp : public ofBaseApp {
 
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
-		
-		bool bHide;
+public:
+	void setup();
+	void update();
+	void draw();
 
-		ofxPanel gui;
-		ofxIntSlider complexityLevel;
-		ofColor textColor;
-		ofxToggle playerToggle;
+	void keyPressed(int key);
+	void keyReleased(int key);
+	void mouseMoved(int x, int y);
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseReleased(int x, int y, int button);
+	void mouseEntered(int x, int y);
+	void mouseExited(int x, int y);
+	void windowResized(int w, int h);
+	void dragEvent(ofDragInfo dragInfo);
+	void gotMessage(ofMessage msg);
 
-		bool gameState;
-		float endTime;
-		float startTime;
-		int nEnergy;
-		bool playerSprite;
+	bool bHide;
 
-		Emitter emitter;
-		Sprite player;
-		Sprite agent;
+	ofxPanel gui;
+	ofxIntSlider complexityLevel;
+	ofColor textColor;
+	ofxLabel screenSize;
 
-		std::set<int> keysPressed;
+	//agent gui
+	ofxToggle agentToggleSprite;
+	ofxFloatSlider agentLifespan;
+	ofxFloatSlider spawnRate;
+	ofxFloatSlider agentScale;
+	ofxFloatSlider agentRotationSpeed = 3.0;
+	ofxFloatSlider nAgents = 1;
+	ofxFloatSlider agentSpeed = 1.0;
 
+	//player gui
+	ofxFloatSlider playerScale;
+	ofxFloatSlider playerRotSpeed = 5.0f;
+	ofxToggle toggleHeadingVector;
+	ofxFloatSlider playerSpeed = 10.0f;
+	ofxFloatSlider playerEnergy = 10.0f;
+	ofxToggle playerToggleSprite;
+
+	bool gameState;
+	float endTime;
+	float startTime;
+	int nEnergy;
+	bool playerSprite = false;
+
+	Emitter emitter;
+	Sprite player;
+	vector<Sprite> agents;
+
+	std::set<int> keysPressed;
+
+	ofImage turtle;
+	ofImage coconut;
+	ofImage background;
 
 };
