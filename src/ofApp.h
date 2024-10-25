@@ -9,7 +9,7 @@
 
 class ofApp : public ofBaseApp {
 private:
-	void setComplexityDefault(int level);
+	void setComplexityLevels(int level);
 
 	int trackComplexity;
 
