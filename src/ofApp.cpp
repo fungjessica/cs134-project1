@@ -66,6 +66,7 @@ void ofApp::update() {
 		}
 
 		// Write player methods here
+		player.bShowImage = playerToggleSprite;
 		player.scale = glm::vec3(float(playerScale), float(playerScale), float(playerScale));
 
 		player.integrate();
@@ -98,9 +99,10 @@ void ofApp::update() {
 
 		emitter.update();
 
-		// Boilerplate code for checking collisions (for images only rn)
 		// Work backward so that removing does not cause skipping
 		for (int i = emitter.sys->sprites.size() - 1; i > -1; i--) {
+			emitter.sys->sprites[i].bShowImage = agentToggleSprite;
+
 			emitter.sys->sprites[i].integrate();
 
 			// Check for collisions
@@ -142,36 +144,27 @@ void ofApp::update() {
 			emitter.sys->sprites[i].force += headingVec * 200;
 			float angle = glm::degrees(glm::orientedAngle(headingVec, toPlayerVec, glm::vec3(0, 0, 1)));
 			if (angle < 0.01)
-				emitter.sys->sprites[i].angularForce -= 300;
+				emitter.sys->sprites[i].angularForce -= 250;
 			else
-				emitter.sys->sprites[i].angularForce += 300;
-
+				emitter.sys->sprites[i].angularForce += 250;
 		}
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	ofSetColor(textColor);
 	float scale = max(ofGetWidth() / background.getWidth(), ofGetHeight() / background.getHeight());
 	float width = background.getWidth() * scale;
 	float height = background.getHeight() * scale;
 	background.draw((ofGetWidth() - width) / 2, (ofGetHeight() - height) / 2, width, height);
 
-	// Draw gui
-	if (!bHide)
-		gui.draw();
-
 	// Draw depending on gameState (started, stopped)
 	if (gameState) {
 		endTime = ofGetElapsedTimef();
-		ofSetColor(textColor);
 		ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 10, 20);
 		ofDrawBitmapString("Energy: " + ofToString(nEnergy) + "/" + ofToString(10), 10, 40);
 		ofDrawBitmapString("Time: " + ofToString(endTime - startTime), 10, 60);
-
-		//toggle between triangle and turtle
-		player.bShowImage = playerToggleSprite;
-		emitter.haveChildImage = agentToggleSprite;
 
 		player.draw();
 		emitter.draw();
@@ -180,9 +173,12 @@ void ofApp::draw() {
 		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
 		int width = font.getBoundingBox(text, 0, 0).getWidth();
 		int height = font.getBoundingBox(text, 0, 0).getHeight();
-		ofSetColor(textColor);
 		ofDrawBitmapString(text, ofGetWidth() / 2 - width / 2, ofGetHeight() / 2 - height / 2);
 	}
+
+	// Draw gui
+	if (!bHide)
+		gui.draw();
 }
 
 //--------------------------------------------------------------
