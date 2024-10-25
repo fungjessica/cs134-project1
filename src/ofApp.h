@@ -7,7 +7,6 @@
 
 //sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
 
-
 class ofApp : public ofBaseApp {
 
 public:
@@ -31,9 +30,7 @@ public:
 
 	ofxPanel gui;
 	ofxIntSlider complexityLevel;
-	ofColor textColor;
-	ofxLabel screenSize;
-
+	
 	//agent gui
 	ofxToggle agentToggleSprite;
 	ofxFloatSlider agentLifespan;
@@ -51,20 +48,21 @@ public:
 	ofxFloatSlider playerEnergy = 10.0f;
 	ofxToggle playerToggleSprite;
 
+	ofColor textColor;
+
 	bool gameState;
 	float endTime;
 	float startTime;
 	int nEnergy;
-	bool playerSprite = false;
+	bool playerSprite;
 
 	Emitter emitter;
 	Sprite player;
-	vector<Sprite> agents;
 
 	std::set<int> keysPressed;
 
-	ofImage turtle;
-	ofImage coconut;
 	ofImage background;
-
+	ofImage coconut;
+	ofImage turtle;
+	ofImage particle;
 };

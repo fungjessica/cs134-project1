@@ -59,6 +59,6 @@ public:
 	ofColor color;
 	float spriteScale;
 	float spriteRotationSpeed;
-	int nAgents = 3;
+	int nAgents;
 };
 

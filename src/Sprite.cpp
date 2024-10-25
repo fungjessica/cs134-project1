@@ -11,7 +11,7 @@ bool Sprite::inside(const glm::vec3 p) {
 	// if there is no sprite image attached, then just use triangle case.
 	//
 	if (!bShowImage) {
-		return insideTriangle (p);
+		return insideTriangle(p);
 	}
 
 	// if sprite image attached, then first check if point is inside bounds of image
@@ -55,46 +55,18 @@ void Sprite::integrate() {
 	float framerate = ofGetFrameRate();
 	float dt = (framerate > 0) ? 1.0 / framerate : 0;
 
-    // --- Player Physics Integration ---
+	//move up/down (linear)
+	pos += velocity * dt;
+	acceleration = (1 / mass) * force;
+	velocity += acceleration * dt;
+	velocity *= damping;
 
-    // Linear movement 
-    pos += velocity * dt;
-    acceleration = (1 / mass) * force;
-    velocity += acceleration * dt;
-    velocity *= damping;
+	//rotate (angular)
+	rot += angularVelocity * dt;
+	angularAcceleration = (1 / mass) * angularForce;
+	angularVelocity += angularAcceleration * dt;
+	angularVelocity *= damping;
 
-    // Angular movement 
-    rot += angularVelocity * dt;
-    angularAcceleration = (1 / mass) * angularForce;
-    angularVelocity += angularAcceleration * dt;
-    angularVelocity *= damping;
-
-    // --- Agent Physics Integration ---
-
-    // Linear movement 
-    agentPos += agentVelocity;
-    agentAcceleration = (1 / mass) * agentForce;
-    agentVelocity += agentAcceleration * dt;
-    agentVelocity *= damping;
-
-    // Angular movement 
-    agentRot += agentAngularVelocity * dt;
-    agentAngularAcceleration = (1 / mass) * agentAngularForce;
-    agentAngularVelocity += agentAngularAcceleration * dt;
-    agentAngularVelocity *= damping;
-
-    // --- Forces towards player ---
-    float chaseSpeed = 100.0f;
-    glm::vec3 toPlayer = pos - agentPos;
-    glm::vec3 directionToPlayer = glm::normalize(toPlayer);
-    glm::vec3 chasingForce = directionToPlayer * chaseSpeed;
-    agentForce += chasingForce;
-
-   
-
-    // Reset forces
-    force = glm::vec3(0, 0, 0);
-    angularForce = 0;
-    agentForce = glm::vec3(0, 0, 0);
-    agentAngularForce = 0;
+	force = glm::vec3(0, 0, 0);
+	angularForce = 0;
 }

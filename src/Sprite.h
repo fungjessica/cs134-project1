@@ -93,13 +93,5 @@ public:
 	float angularForce = 0;
 	float mass = 1.0;
 	float damping = .99;
-
-	glm::vec3 agentVelocity = glm::vec3(5, 5, 0);
-	glm::vec3 agentAcceleration = glm::vec3(5, 5, 0);
-	glm::vec3 agentForce = glm::vec3(5, 5, 0);
-	float agentAngularVelocity = 0;
-	float agentAngularAcceleration = 0;
-	float agentTurnSpeed = 10.0f;
-	float agentAngularForce = 0;
 };
 
