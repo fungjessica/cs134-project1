@@ -25,6 +25,7 @@ void ofApp::setComplexityLevels(int level) {
 }
 //--------------------------------------------------------------
 void ofApp::setup() {
+	
 	ofSetFrameRate(60);
 
 	bHide = false;
@@ -35,9 +36,12 @@ void ofApp::setup() {
 	background.load("images/cs134_proj2_background.png");
 	coconut.load("images/cs134_proj2_agent.png");
 	turtle.load("images/cs134_proj2_player.png");
-	particle.load("images/cs134_proj2_particle.png");
+	beachBall.load("images/cs134_proj2_particle.png");
 
 	munch.load("sounds/minecraft_eating.mp3");
+	moving.load("sounds/swimming sfx.mp3");
+	boom.load("sounds/pop sfx.mp3");
+	moving.setLoop(false);
 
 	nEnergy = 10;
 
@@ -78,15 +82,53 @@ void ofApp::setup() {
 	player.color = ofColor::yellow;
 	player.setImage(turtle);
 
+	//particle explosion setup
+	turbForce = new TurbulenceForce(ofVec3f(-20, -20, -20), ofVec3f(20, 20, 20));
+	gravityForce = new GravityForce(ofVec3f(0, -10, 0));
+	radialForce = new ImpulseRadialForce(1000.0);
+
+	explosion.sys->addForce(turbForce);
+	explosion.sys->addForce(gravityForce);
+	explosion.sys->addForce(radialForce);
+
 	
+	explosion.setVelocity(ofVec3f(0, 0, 0));
+	explosion.setOneShot(true);
+	explosion.setEmitterType(RadialEmitter);
+	explosion.setGroupSize(2000);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	if (gameState && !gameOver) {
+		
+		explosion.setLifespan(2);
+		explosion.setRate(60);
+		explosion.setParticleRadius(50);
+		//explosion.update();
+
 		if (nEnergy <= 0) {
-			gameOver = true;
-			gameState = false;
+			if (!isDead) {
+				
+				isDead = true;
+				deathTimer = 0.0f;
+				
+				explosion.start();
+				explosion.update();
+			}
+			else {
+				deathTimer += ofGetLastFrameTime();
+				
+				if (deathTimer >= deathPause) {
+					gameOver = true;
+					gameState = false;
+					isDead = false;
+				}
+			}
+		
+		}
+		else {
+			isDead = false;
 		}
 
 		// Handle complexity level
@@ -118,19 +160,27 @@ void ofApp::update() {
 		}
 
 		if (keysPressed.count(OF_KEY_LEFT)) {
-			player.angularForce -= 300.0f;
+			player.angularForce -= playerRotSpeed * 50;
 		}
 		if (keysPressed.count(OF_KEY_RIGHT)) {
-			player.angularForce += 300.0f;
+
+			player.angularForce += playerRotSpeed * 50;
 		}
 		if (keysPressed.count(OF_KEY_UP)) {
-			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1)) * 500;
+
+			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1)) * (float)playerSpeed * 50;
 		}
 		if (keysPressed.count(OF_KEY_DOWN)) {
-			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, 1, 0, 1)) * 500;
+			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, 1, 0, 1)) * (float)playerSpeed * 50;
 		}
 
-		
+		if (isKeyHeld && !moving.isPlaying()) {
+			moving.play();
+		}
+		else if (!isKeyHeld && stopTimer > 0.0f && ofGetElapsedTimef() >= stopTimer) {
+			moving.stop();
+			stopTimer = 0.0f;
+		}
 
 		int trackAgents = emitter.sys->sprites.size();
 		if (trackAgents < nAgents) {
@@ -192,9 +242,11 @@ void ofApp::update() {
 
 			emitter.setRate(spawnRate);
 			emitter.setLifespan(agentLifespan * 1000);
-			
+			emitter.scale = glm::vec3(float(agentScale), float(agentScale), float(agentScale));
 		}
 	}
+
+	
 }
 
 //--------------------------------------------------------------
@@ -212,9 +264,12 @@ void ofApp::draw() {
 		ofDrawBitmapString("Energy: " + ofToString(nEnergy) + "/" + ofToString(10), 10, 40);
 		ofDrawBitmapString("Time: " + ofToString(endTime - startTime), 10, 60);
 
-		player.draw();
+		if (!isDead) {
+			player.draw();
+		}
+		
 		emitter.draw();
-
+		explosion.draw();
 	}
 	else if (gameOver) {
 		ofSetColor(ofColor::red);
@@ -233,6 +288,8 @@ void ofApp::draw() {
 	// Draw gui
 	if (!bHide)
 		gui.draw();
+
+	
 }
 
 //--------------------------------------------------------------
@@ -249,6 +306,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case ' ':
 		if (gameOver) {
+			explosion.sys->reset();
 			nEnergy = 10;
 			gameOver = false;
 			gameState = false;
@@ -256,6 +314,7 @@ void ofApp::keyPressed(int key) {
 			playerToggleSprite = false;
 			agentToggleSprite = false;
 			startTime = ofGetElapsedTimef();
+			playerScale = 1;
 		}
 		else if (gameState == false) {
 			gameState = true;
@@ -263,11 +322,27 @@ void ofApp::keyPressed(int key) {
 		}
 		break;
 	}
+
+	if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_LEFT || key == OF_KEY_RIGHT) {
+		if (!isKeyHeld) {
+			isKeyHeld = true;
+			stopTimer = 0.0f;
+			moving.play();
+			
+		}
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
 	keysPressed.erase(key);
+	
+	if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_LEFT || key == OF_KEY_RIGHT) {
+		isKeyHeld = false;
+		stopTimer = ofGetElapsedTimef() + 2.0f;
+		moving.stop();
+			
+	}
 }
 
 //--------------------------------------------------------------
