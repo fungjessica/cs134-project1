@@ -43,6 +43,8 @@ public:
 		return (s.x > -width / 2 && s.x < width / 2 && s.y > -height / 2 && s.y < height / 2);
 	}
 
+	void setParticleImage(ofImage image);
+
 	SpriteList* sys;
 	float rate;
 	glm::vec3 velocity;
@@ -60,4 +62,7 @@ public:
 	float spriteScale;
 	float spriteRotationSpeed;
 	int nAgents;
+
+	bool hasParticleImage;
+	ofImage particleImage;
 };
