@@ -46,7 +46,7 @@ void ofApp::setup() {
 	turtle.load("images/cs134_proj2_player.png");
 	beachBall.load("images/cs134_proj2_particle.png");
 
-	//scale beach ball (particle) sprite
+	//scale beach ball (particle) and coconut (agent) sprite
 	float beachBallScale = 0.5;
 	beachBall.resize(beachBall.getWidth() * beachBallScale, beachBall.getHeight() * beachBallScale);
 	float coconutScale = 0.8;
