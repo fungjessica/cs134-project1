@@ -7,8 +7,6 @@
 #include "ParticleEmitter.h"
 #include <set>;
 
-//sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
-
 class ofApp : public ofBaseApp {
 private:
 	void setComplexityLevels(int level);
