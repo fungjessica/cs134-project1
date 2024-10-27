@@ -24,7 +24,8 @@ ParticleEmitter::~ParticleEmitter() {
 
 	// deallocate particle system if emitter created one internally
 	//
-	if (createdSys) delete sys;
+	// This causes an error
+	// if (createdSys) delete sys;
 }
 
 void ParticleEmitter::init() {
@@ -48,11 +49,11 @@ void ParticleEmitter::draw() {
 	if (visible) {
 		switch (type) {
 		case DirectionalEmitter:
-			ofDrawSphere(position, radius/10);  // just draw a small sphere for point emitters 
+			ofDrawSphere(pos, radius/10);  // just draw a small sphere for point emitters 
 			break;
 		case SphereEmitter:
 		case RadialEmitter:
-			ofDrawSphere(position, radius/10);  // just draw a small sphere as a placeholder
+			ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
 			break;
 		default:
 			break;
@@ -115,14 +116,14 @@ void ParticleEmitter::spawn(float time) {
 		ofVec3f dir = ofVec3f(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1));
 		float speed = velocity.length();
 		particle.velocity = dir.getNormalized() * speed;
-		particle.position.set(position);
+		particle.position.set(pos);
 	}
 	break;
 	case SphereEmitter:
 		break;
 	case DirectionalEmitter:
 		particle.velocity = velocity;
-		particle.position.set(position);
+		particle.position.set(pos);
 		break;
 	}
 
@@ -132,7 +133,15 @@ void ParticleEmitter::spawn(float time) {
 	particle.birthtime = time;
 	particle.radius = particleRadius;
 
+	if (hasParticleImage)
+		particle.setImage(particleImage);
+
 	// add to system
 	//
 	sys->add(particle);
+}
+
+void ParticleEmitter::setParticleImage(ofImage image) {
+	hasParticleImage = true;
+	particleImage = image;
 }

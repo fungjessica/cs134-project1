@@ -20,7 +20,14 @@ public:
 	void    integrate();
 	void    draw();
 	float   age();        // sec
+
+	void setImage(ofImage image);
+	bool inside(glm::vec3 p);
+
 	ofColor color;
+
+	bool hasImage = false;
+	ofImage image;
 };
 
 

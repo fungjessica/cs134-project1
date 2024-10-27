@@ -113,6 +113,11 @@ void TurbulenceForce::updateForce(Particle * particle) {
 	particle->forces.z += ofRandom(tmin.z, tmax.z);
 }
 
+void TurbulenceForce::set(const ofVec3f& min, const ofVec3f& max) {
+	tmin = min;
+	tmax = max;
+}
+
 // Impulse Radial Force - this is a "one shot" force that
 // eminates radially outward in random directions.
 //
@@ -128,4 +133,9 @@ void ImpulseRadialForce::updateForce(Particle * particle) {
 	//
 	ofVec3f dir = ofVec3f(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1));
 	particle->forces += dir.getNormalized() * magnitude;
+}
+
+void ImpulseRadialForce::set(float magnitude) {
+	this->magnitude = magnitude;
+	applyOnce = true;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Shape.h"
-
+#include "ParticleEmitter.h"
 
 
 // Base class for a Sprite. Can be instantiated on it's own (deafult)
@@ -18,7 +18,7 @@ public:
 		verts.push_back(glm::vec3(20, 20, 0));
 		verts.push_back(glm::vec3(0, -20, 0));
 	}
-	
+
 	// some functions for highlighting when selected
 	//
 	void draw() {
@@ -38,6 +38,9 @@ public:
 			ofDrawTriangle(verts[0], verts[1], verts[2]);
 			ofPopMatrix();
 		}
+
+		if (emitParticles)
+			particleEmitter.draw();
 	}
 
 	float age() {
@@ -55,7 +58,7 @@ public:
 	virtual void update() {}
 
 	bool insideTriangle(const glm::vec3 p);
-	
+
 
 	void setSelected(bool state) { bSelected = state; }
 	void setHighlight(bool state) { bHighlight = state; }
@@ -72,9 +75,11 @@ public:
 	float rotationSpeed = 0.0;
 	float birthtime = 0; // elapsed time in ms
 	float lifespan = -1;  //  time in ms
-	string name =  "UnammedSprite";
+	string name = "UnammedSprite";
 	float width = 40;
 	float height = 40;
+
+	float speed;
 
 	ofImage spriteImage;
 
@@ -93,5 +98,7 @@ public:
 	float angularForce = 0;
 	float mass = 1.0;
 	float damping = .99;
-};
 
+	bool emitParticles = false;
+	ParticleEmitter particleEmitter;
+};

@@ -1,7 +1,7 @@
 #pragma once
 //  Kevin M. Smith - CS 134 SJSU
 
-#include "TransformObject.h"
+#include "Shape.h"
 #include "ParticleSystem.h"
 
 typedef enum { DirectionalEmitter, RadialEmitter, SphereEmitter } EmitterType;
@@ -9,17 +9,17 @@ typedef enum { DirectionalEmitter, RadialEmitter, SphereEmitter } EmitterType;
 //  General purpose Emitter class for emitting sprites
 //  This works similar to a Particle emitter
 //
-class ParticleEmitter : public TransformObject {
+class ParticleEmitter : public Shape {
 public:
 	ParticleEmitter();
-	ParticleEmitter(ParticleSystem *s);
+	ParticleEmitter(ParticleSystem* s);
 	~ParticleEmitter();
 	void init();
 	void draw();
 	void start();
 	void stop();
-	void setLifespan(const float life)   { lifespan = life; }
-	void setVelocity(const ofVec3f &vel) { velocity = vel; }
+	void setLifespan(const float life) { lifespan = life; }
+	void setVelocity(const ofVec3f& vel) { velocity = vel; }
 	void setRate(const float r) { rate = r; }
 	void setParticleRadius(const float r) { particleRadius = r; }
 	void setEmitterType(EmitterType t) { type = t; }
@@ -27,7 +27,10 @@ public:
 	void setOneShot(bool s) { oneShot = s; }
 	void update();
 	void spawn(float time);
-	ParticleSystem *sys;
+
+	void setParticleImage(ofImage image);
+
+	ParticleSystem* sys;
 	float rate;         // per sec
 	bool oneShot;
 	bool fired;
@@ -41,4 +44,12 @@ public:
 	int groupSize;      // number of particles to spawn in a group
 	bool createdSys;
 	EmitterType type;
+
+	glm::vec3 explosionPos;
+	void setPosition(const glm::vec3& pos) {
+		explosionPos = pos;
+	}
+
+	bool hasParticleImage;
+	ofImage particleImage;
 };
