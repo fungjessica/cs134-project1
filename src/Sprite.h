@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Shape.h"
-
+#include "ParticleEmitter.h"
 
 
 // Base class for a Sprite. Can be instantiated on it's own (deafult)
@@ -38,6 +38,9 @@ public:
 			ofDrawTriangle(verts[0], verts[1], verts[2]);
 			ofPopMatrix();
 		}
+
+		if (emitParticles)
+			particleEmitter.draw();
 	}
 
 	float age() {
@@ -94,5 +97,8 @@ public:
 	float angularAcceleration = 0;
 	float angularForce = 0;
 	float mass = 1.0;
-	float damping = .99;
+	float damping = .95;
+
+	bool emitParticles = false;
+	ParticleEmitter particleEmitter;
 };
