@@ -46,6 +46,8 @@ public:
 	ofxIntSlider nAgents = 1;
 	ofxFloatSlider agentSpeed = 1.0;
 
+	//ofxToggle particleToggleSprite;
+
 	//player gui
 	ofxFloatSlider playerScale;
 	ofxFloatSlider playerRotSpeed = 5.0f;
@@ -83,7 +85,7 @@ public:
 
 	//particle emitter class (explosion and ray)
 	ParticleEmitter explosion;
-	
+	void resetExplosion();
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
