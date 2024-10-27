@@ -166,17 +166,17 @@ void Emitter::update() {
 		else s++;
 	}
 
-	
+
 	for (int i = 0; i < sys->sprites.size(); i++) {
 		moveSprite(&sys->sprites[i]);
 	}
-	
+
 }
 
 // virtual function to move sprite (can be overloaded)
 //
-void Emitter::moveSprite(Sprite *sprite) {
-    sprite->pos += sprite->velocity / ofGetFrameRate();
+void Emitter::moveSprite(Sprite* sprite) {
+	sprite->pos += sprite->velocity / ofGetFrameRate();
 	sprite->rot += sprite->rotationSpeed;
 }
 
@@ -190,6 +190,14 @@ void Emitter::spawnSprite() {
 	sprite.pos = glm::vec3(ofRandom(0, ofGetWidth()), ofRandom(0, ofGetHeight()), 1);
 	sprite.rot = ofRandom(0, 360);
 	sprite.birthtime = ofGetElapsedTimeMillis();
+
+	sprite.emitParticles = true;
+	sprite.particleEmitter.setParticleRadius(15);
+	sprite.particleEmitter.setRate(2);
+	if (hasParticleImage)
+		sprite.particleEmitter.setParticleImage(particleImage);
+	sprite.particleEmitter.start();
+
 	sys->add(sprite);
 }
 
@@ -224,4 +232,9 @@ void Emitter::setImage(ofImage img) {
 
 void Emitter::setRate(float r) {
 	rate = r;
+}
+
+void Emitter::setParticleImage(ofImage image) {
+	hasParticleImage = true;
+	particleImage = image;
 }
