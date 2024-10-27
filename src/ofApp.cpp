@@ -41,12 +41,12 @@ void ofApp::setup() {
 	gameOver = false;
 	textColor = ofColor::white;
 
-	background.load("images/cs134_proj2_background.png");
+	background.load("images/cs134 proj2 background.png");
 	coconut.load("images/cs134_proj2_agent.png");
 	turtle.load("images/cs134_proj2_player.png");
 	beachBall.load("images/cs134_proj2_particle.png");
 
-	//scale beach ball (particle) and coconut (agent) sprite
+	//scale beach ball (particle) sprite
 	float beachBallScale = 0.5;
 	beachBall.resize(beachBall.getWidth() * beachBallScale, beachBall.getHeight() * beachBallScale);
 	float coconutScale = 0.8;
@@ -126,8 +126,11 @@ void ofApp::update() {
 				isDead = true;
 				deathTimer = 0.0f;
 
+				boom.setPosition(1);
+				boom.play();
 				explosion.pos = player.pos;
 				explosion.start();
+				
 				resetExplosion();
 			}
 			else {
