@@ -1,7 +1,7 @@
 #pragma once
 //  Kevin M. Smith - CS 134 SJSU
 
-#include "TransformObject.h"
+#include "Shape.h"
 #include "ParticleSystem.h"
 
 typedef enum { DirectionalEmitter, RadialEmitter, SphereEmitter } EmitterType;
@@ -9,7 +9,7 @@ typedef enum { DirectionalEmitter, RadialEmitter, SphereEmitter } EmitterType;
 //  General purpose Emitter class for emitting sprites
 //  This works similar to a Particle emitter
 //
-class ParticleEmitter : public TransformObject {
+class ParticleEmitter : public Shape {
 public:
 	ParticleEmitter();
 	ParticleEmitter(ParticleSystem* s);
@@ -27,6 +27,9 @@ public:
 	void setOneShot(bool s) { oneShot = s; }
 	void update();
 	void spawn(float time);
+
+	void setParticleImage(ofImage image);
+
 	ParticleSystem* sys;
 	float rate;         // per sec
 	bool oneShot;
@@ -46,4 +49,7 @@ public:
 	void setPosition(const glm::vec3& pos) {
 		explosionPos = pos;
 	}
+
+	bool hasParticleImage;
+	ofImage particleImage;
 };
