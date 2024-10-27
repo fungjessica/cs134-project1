@@ -41,7 +41,7 @@ void ofApp::setup() {
 	gameOver = false;
 	textColor = ofColor::white;
 
-	background.load("images/cs134 proj2 background.png");
+	background.load("images/cs134_proj2_background.png");
 	coconut.load("images/cs134_proj2_agent.png");
 	turtle.load("images/cs134_proj2_player.png");
 	beachBall.load("images/cs134_proj2_particle.png");
