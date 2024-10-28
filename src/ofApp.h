@@ -51,7 +51,7 @@ public:
 	ofxFloatSlider playerRotSpeed = 5.0f;
 	ofxToggle toggleHeadingVector;
 	ofxFloatSlider playerSpeed = 10.0f;
-	ofxFloatSlider playerEnergy = 10.0f;
+	ofxIntSlider playerEnergy = 10;
 	ofxToggle playerToggleSprite;
 
 	ofColor textColor;
@@ -63,6 +63,7 @@ public:
 	int nEnergy;
 	bool playerSprite;
 	const int maxAgents = 5;
+	
 
 	Emitter emitter;
 	Sprite player;
