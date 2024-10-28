@@ -192,7 +192,7 @@ void Emitter::spawnSprite() {
 	sprite.birthtime = ofGetElapsedTimeMillis();
 
 	sprite.emitParticles = true;
-	sprite.particleEmitter.setParticleRadius(15);
+	sprite.particleEmitter.setParticleRadius(5);
 	sprite.particleEmitter.setRate(2);
 	if (hasParticleImage)
 		sprite.particleEmitter.setParticleImage(particleImage);
