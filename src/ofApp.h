@@ -7,8 +7,6 @@
 #include "ParticleEmitter.h"
 #include <set>;
 
-//sources: https://www.geeksforgeeks.org/set-in-cpp-stl/#
-
 class ofApp : public ofBaseApp {
 private:
 	void setComplexityLevels(int level);
@@ -45,6 +43,8 @@ public:
 	ofxFloatSlider agentRotationSpeed = 3.0;
 	ofxIntSlider nAgents = 1;
 	ofxFloatSlider agentSpeed = 1.0;
+
+	//ofxToggle particleToggleSprite;
 
 	//player gui
 	ofxFloatSlider playerScale;
@@ -83,7 +83,7 @@ public:
 
 	//particle emitter class (explosion and ray)
 	ParticleEmitter explosion;
-
+	void resetExplosion();
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;

@@ -166,17 +166,17 @@ void Emitter::update() {
 		else s++;
 	}
 
-	
+
 	for (int i = 0; i < sys->sprites.size(); i++) {
 		moveSprite(&sys->sprites[i]);
 	}
-	
+
 }
 
 // virtual function to move sprite (can be overloaded)
 //
-void Emitter::moveSprite(Sprite *sprite) {
-    sprite->pos += sprite->velocity / ofGetFrameRate();
+void Emitter::moveSprite(Sprite* sprite) {
+	sprite->pos += sprite->velocity / ofGetFrameRate();
 	sprite->rot += sprite->rotationSpeed;
 }
 

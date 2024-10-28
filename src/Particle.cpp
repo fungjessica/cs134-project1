@@ -18,11 +18,12 @@ Particle::Particle() {
 }
 
 void Particle::draw() {
-//	ofSetColor(color);
+	//	ofSetColor(color);
 	if (hasImage) {
 		ofSetColor(ofColor::white);
 		image.draw(glm::vec3(position.x - image.getWidth() / 2, position.y - image.getHeight() / 2, 0));
-	} else {
+	}
+	else {
 		ofSetColor(ofMap(age(), 0, lifespan, 255, 10), 0, 0);
 		ofDrawSphere(position, radius);
 	}
@@ -56,7 +57,7 @@ void Particle::integrate() {
 //  return age in seconds
 //
 float Particle::age() {
-	return (ofGetElapsedTimeMillis() - birthtime)/1000.0;
+	return (ofGetElapsedTimeMillis() - birthtime) / 1000.0;
 }
 
 void Particle::setImage(ofImage image) {
@@ -76,8 +77,10 @@ bool Particle::inside(glm::vec3 p) {
 			return (color.a != 0);   // check if color is opaque (not the transparent background)
 		}
 		else return false;
-	} else {
+	}
+	else {
 		if (glm::length(p - position) < radius)
 			return true;
 	}
+	return false;
 }

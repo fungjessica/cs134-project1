@@ -23,6 +23,14 @@ void ofApp::setComplexityLevels(int level) {
 		break;
 	}
 }
+
+void ofApp::resetExplosion() {
+	explosion.sys->reset();
+
+	explosion.setLifespan(deathPause);
+	explosion.setVelocity(ofVec3f(0, 0, 0));
+
+}
 //--------------------------------------------------------------
 void ofApp::setup() {
 
@@ -33,10 +41,16 @@ void ofApp::setup() {
 	gameOver = false;
 	textColor = ofColor::white;
 
-	background.load("images/cs134_proj2_background.png");
+	background.load("images/cs134 proj2 background.png");
 	coconut.load("images/cs134_proj2_agent.png");
 	turtle.load("images/cs134_proj2_player.png");
 	beachBall.load("images/cs134_proj2_particle.png");
+
+	//scale beach ball (particle) sprite
+	float beachBallScale = 0.5;
+	beachBall.resize(beachBall.getWidth() * beachBallScale, beachBall.getHeight() * beachBallScale);
+	float coconutScale = 0.8;
+	coconut.resize(coconut.getWidth() * coconutScale, coconut.getHeight() * coconutScale);
 
 	munch.load("sounds/minecraft_eating.mp3");
 	moving.load("sounds/swimming sfx.mp3");
@@ -93,7 +107,7 @@ void ofApp::setup() {
 	explosion.sys->addForce(radialForce);
 
 	explosion.setLifespan(deathPause);
-	explosion.setParticleRadius(15);
+	explosion.setParticleRadius(5);
 	explosion.setVelocity(ofVec3f(0, 0, 0));
 	explosion.setEmitterType(RadialEmitter);
 	explosion.setGroupSize(20);
@@ -112,8 +126,12 @@ void ofApp::update() {
 				isDead = true;
 				deathTimer = 0.0f;
 
+				boom.setPosition(1);
+				boom.play();
 				explosion.pos = player.pos;
 				explosion.start();
+
+				resetExplosion();
 			}
 			else {
 				deathTimer += ofGetLastFrameTime();
@@ -162,18 +180,18 @@ void ofApp::update() {
 		}
 
 		if (keysPressed.count(OF_KEY_LEFT)) {
-			player.angularForce -= playerRotSpeed * 50;
+			player.angularForce -= playerRotSpeed * 70;
 		}
 		if (keysPressed.count(OF_KEY_RIGHT)) {
 
-			player.angularForce += playerRotSpeed * 50;
+			player.angularForce += playerRotSpeed * 70;
 		}
 		if (keysPressed.count(OF_KEY_UP)) {
 
-			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1)) * (float)playerSpeed * 50;
+			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1)) * (float)playerSpeed * 70;
 		}
 		if (keysPressed.count(OF_KEY_DOWN)) {
-			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, 1, 0, 1)) * (float)playerSpeed * 50;
+			player.force += glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, 1, 0, 1)) * (float)playerSpeed * 70;
 		}
 
 		if (isKeyHeld && !moving.isPlaying()) {
@@ -191,10 +209,11 @@ void ofApp::update() {
 
 		emitter.setRate(spawnRate);
 		emitter.setLifespan(agentLifespan * 1000);
-		emitter.scale = glm::vec3(float(agentScale), float(agentScale), float(agentScale));
+
 
 		// Work backward so that removing does not cause skipping
 		for (int i = emitter.sys->sprites.size() - 1; i > -1; i--) {
+			emitter.sys->sprites[i].scale = glm::vec3(float(agentScale));
 			emitter.sys->sprites[i].bShowImage = agentToggleSprite;
 
 			emitter.sys->sprites[i].integrate();
@@ -228,23 +247,28 @@ void ofApp::update() {
 				}
 			}
 
-			if (collision) {
+			if (collision && !isDead) {
 				emitter.sys->remove(i);
+				explosion.pos = player.pos;
+				explosion.start();
+				resetExplosion();
 				munch.play();
-				nEnergy++;
+				if (nEnergy < playerEnergy)
+					nEnergy++;
 				continue;
 			}
 
 			// Write agent updates down here (motion, etc.)
 			glm::vec3 headingVec = glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(emitter.sys->sprites[i].rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1));
 			glm::vec3 toPlayerVec = glm::normalize(player.pos - emitter.sys->sprites[i].pos);
-			emitter.sys->sprites[i].force += headingVec * (float)agentSpeed * 50;
+			emitter.sys->sprites[i].force += headingVec * (float)agentSpeed * 100;
+
 			float angle = glm::degrees(glm::orientedAngle(headingVec, toPlayerVec, glm::vec3(0, 0, 1)));
 			float scalar = pow(2, fmod(abs(angle), 360) / 360) - 1;
 			if (angle < -0.01)
-				emitter.sys->sprites[i].angularForce -= 750 * scalar;
+				emitter.sys->sprites[i].angularForce -= 1500 * agentSpeed * scalar;
 			else if (angle > 0.01)
-				emitter.sys->sprites[i].angularForce += 750 * scalar;
+				emitter.sys->sprites[i].angularForce += 1500 * agentSpeed * scalar;
 
 			emitter.sys->sprites[i].particleEmitter.pos = emitter.sys->sprites[i].pos;
 			emitter.sys->sprites[i].particleEmitter.setVelocity(headingVec * 750);
@@ -252,6 +276,8 @@ void ofApp::update() {
 
 			// Update emitter particles
 			for (int j = emitter.sys->sprites[i].particleEmitter.sys->particles.size() - 1; j > -1; j--) {
+				emitter.sys->sprites[i].particleEmitter.sys->particles[j].hasImage = agentToggleSprite;
+
 				bool particleCollision = false;
 
 				for (int k = 0; k < player.verts.size(); k++) {
@@ -263,16 +289,20 @@ void ofApp::update() {
 					}
 				}
 
-				if (particleCollision) {
+				if (!emitter.sys->sprites[i].particleEmitter.sys->particles[j].hasImage) {
+					if (player.inside(emitter.sys->sprites[i].particleEmitter.sys->particles[j].position))
+						particleCollision = true;
+				}
+
+				if (particleCollision && !isDead) {
 					emitter.sys->sprites[i].particleEmitter.sys->particles.erase(emitter.sys->sprites[i].particleEmitter.sys->particles.begin() + j);
-					nEnergy--;
+					if (nEnergy > 0)
+						nEnergy--;
 					continue;
 				}
 			}
 		}
 	}
-
-
 }
 
 //--------------------------------------------------------------
@@ -296,16 +326,32 @@ void ofApp::draw() {
 
 		emitter.draw();
 		explosion.draw();
+
+		if (toggleHeadingVector) {
+			glm::vec3 headingVecDirection = glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(player.rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1));
+			ofSetColor(ofColor::red);
+
+			if (playerToggleSprite) {
+				float headingVecLength = 70;
+				glm::vec3 headingVecPos = player.pos + headingVecDirection * headingVecLength;
+				ofDrawLine(player.pos, headingVecPos);
+			}
+			else {
+				float headingVecLength = 50;
+				glm::vec3 headingVecPos = player.pos + headingVecDirection * headingVecLength;
+				ofDrawLine(player.pos, headingVecPos);
+			}
+		}
 	}
 	else if (gameOver) {
 		ofSetColor(ofColor::red);
-		ofDrawBitmapString("Game Over", ofGetWidth() / 2 - 40, ofGetHeight() / 2);
-		ofDrawBitmapString("Press Space to Restart", ofGetWidth() / 2 - 80, ofGetHeight() / 2 + 20);
-
+		ofDrawBitmapString("Game Over", ofGetWidth() / 2 - 20, ofGetHeight() / 2);
+		ofDrawBitmapString("Last Record: " + ofToString(endTime - startTime), ofGetWidth() / 2 - 70, ofGetHeight() / 2 + 20);
+		ofDrawBitmapString("Press Space to Restart", ofGetWidth() / 2 - 80, ofGetHeight() / 2 + 40);
 	}
 	else {
 		ofBitmapFont font = ofBitmapFont();
-		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
+		string text = "Press Space to Start";
 		int width = font.getBoundingBox(text, 0, 0).getWidth();
 		int height = font.getBoundingBox(text, 0, 0).getHeight();
 		ofDrawBitmapString(text, ofGetWidth() / 2 - width / 2, ofGetHeight() / 2 - height / 2);
@@ -314,8 +360,6 @@ void ofApp::draw() {
 	// Draw gui
 	if (!bHide)
 		gui.draw();
-
-
 }
 
 //--------------------------------------------------------------
@@ -331,8 +375,12 @@ void ofApp::keyPressed(int key) {
 		ofToggleFullscreen();
 		break;
 	case ' ':
+		if (emitter.sys == nullptr) {
+			cout << "emitter particle system is null" << endl;
+			return;
+		}
 		if (gameOver) {
-			explosion.sys->reset();
+			resetExplosion();
 			nEnergy = 10;
 			gameOver = false;
 			gameState = false;

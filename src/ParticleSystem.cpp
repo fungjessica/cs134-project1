@@ -3,11 +3,11 @@
 
 #include "ParticleSystem.h"
 
-void ParticleSystem::add(const Particle &p) {
+void ParticleSystem::add(const Particle& p) {
 	particles.push_back(p);
 }
 
-void ParticleSystem::addForce(ParticleForce *f) {
+void ParticleSystem::addForce(ParticleForce* f) {
 	forces.push_back(f);
 }
 
@@ -29,7 +29,7 @@ void ParticleSystem::reset() {
 
 void ParticleSystem::update() {
 	// check if empty and just return
-	if (particles.size() == 0) return;
+	if (particles.empty()) return;
 
 	vector<Particle>::iterator p = particles.begin();
 	vector<Particle>::iterator tmp;
@@ -50,8 +50,12 @@ void ParticleSystem::update() {
 	//
 	for (int i = 0; i < particles.size(); i++) {
 		for (int k = 0; k < forces.size(); k++) {
+			if (forces[k] == nullptr) {
+				cout << "Warning: Force is null!" << endl;
+				continue;
+			}
 			if (!forces[k]->applied)
-				forces[k]->updateForce( &particles[i] );
+				forces[k]->updateForce(&particles[i]);
 		}
 	}
 
@@ -72,7 +76,7 @@ void ParticleSystem::update() {
 
 // remove all particlies within "dist" of point (not implemented as yet)
 //
-int ParticleSystem::removeNear(const ofVec3f & point, float dist) { return 0; }
+int ParticleSystem::removeNear(const ofVec3f& point, float dist) { return 0; }
 
 //  draw the particle cloud
 //
@@ -85,11 +89,11 @@ void ParticleSystem::draw() {
 
 // Gravity Force Field 
 //
-GravityForce::GravityForce(const ofVec3f &g) {
+GravityForce::GravityForce(const ofVec3f& g) {
 	gravity = g;
 }
 
-void GravityForce::updateForce(Particle * particle) {
+void GravityForce::updateForce(Particle* particle) {
 	//
 	// f = mg
 	//
@@ -98,12 +102,12 @@ void GravityForce::updateForce(Particle * particle) {
 
 // Turbulence Force Field 
 //
-TurbulenceForce::TurbulenceForce(const ofVec3f &min, const ofVec3f &max) {
+TurbulenceForce::TurbulenceForce(const ofVec3f& min, const ofVec3f& max) {
 	tmin = min;
 	tmax = max;
 }
 
-void TurbulenceForce::updateForce(Particle * particle) {
+void TurbulenceForce::updateForce(Particle* particle) {
 	//
 	// We are going to add a little "noise" to a particles
 	// forces to achieve a more natual look to the motion
@@ -126,7 +130,7 @@ ImpulseRadialForce::ImpulseRadialForce(float magnitude) {
 	applyOnce = true;
 }
 
-void ImpulseRadialForce::updateForce(Particle * particle) {
+void ImpulseRadialForce::updateForce(Particle* particle) {
 
 	// we basically create a random direction for each particle
 	// the force is only added once after it is triggered.

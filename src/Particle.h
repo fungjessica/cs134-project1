@@ -29,5 +29,3 @@ public:
 	bool hasImage = false;
 	ofImage image;
 };
-
-

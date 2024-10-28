@@ -97,7 +97,7 @@ public:
 	float angularAcceleration = 0;
 	float angularForce = 0;
 	float mass = 1.0;
-	float damping = .99;
+	float damping = .95;
 
 	bool emitParticles = false;
 	ParticleEmitter particleEmitter;
