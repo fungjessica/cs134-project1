@@ -57,7 +57,7 @@ void ofApp::setup() {
 	boom.load("sounds/pop sfx.mp3");
 	moving.setLoop(false);
 
-	nEnergy = 10;
+	nEnergy = playerEnergy;
 
 	trackComplexity = complexityLevel;
 
@@ -96,6 +96,7 @@ void ofApp::setup() {
 	player.pos = glm::vec3(ofGetWidth() / 2.0, ofGetHeight() / 2.0, 0);
 	player.color = ofColor::yellow;
 	player.setImage(turtle);
+	
 
 	//particle explosion setup
 	turbForce = new TurbulenceForce(ofVec3f(-20, -20, -20), ofVec3f(20, 20, 20));
@@ -117,7 +118,7 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 	if (gameState && !gameOver) {
-
+		nEnergy = playerEnergy;
 		explosion.update();
 
 		if (nEnergy <= 0) {
@@ -130,7 +131,7 @@ void ofApp::update() {
 				boom.play();
 				explosion.pos = player.pos;
 				explosion.start();
-				
+
 				resetExplosion();
 			}
 			else {
@@ -195,6 +196,7 @@ void ofApp::update() {
 		}
 
 		if (isKeyHeld && !moving.isPlaying()) {
+			moving.setLoop(true);
 			moving.play();
 		}
 		else if (!isKeyHeld && stopTimer > 0.0f && ofGetElapsedTimef() >= stopTimer) {
@@ -207,9 +209,10 @@ void ofApp::update() {
 			emitter.update();
 		}
 
+		
 		emitter.setRate(spawnRate);
 		emitter.setLifespan(agentLifespan * 1000);
-		
+
 
 		// Work backward so that removing does not cause skipping
 		for (int i = emitter.sys->sprites.size() - 1; i > -1; i--) {
@@ -247,13 +250,16 @@ void ofApp::update() {
 				}
 			}
 
-			if (collision) {
+			if (collision && !isDead) {
 				emitter.sys->remove(i);
 				explosion.pos = player.pos;
 				explosion.start();
 				resetExplosion();
 				munch.play();
-				nEnergy++;
+				if (nEnergy <= playerEnergy) {
+					nEnergy++;
+					playerEnergy = nEnergy;
+				}
 				continue;
 			}
 
@@ -261,12 +267,13 @@ void ofApp::update() {
 			glm::vec3 headingVec = glm::vec3(glm::rotate(glm::mat4(1.0), glm::radians(emitter.sys->sprites[i].rot), glm::vec3(0, 0, 1)) * glm::vec4(0, -1, 0, 1));
 			glm::vec3 toPlayerVec = glm::normalize(player.pos - emitter.sys->sprites[i].pos);
 			emitter.sys->sprites[i].force += headingVec * (float)agentSpeed * 100;
+
 			float angle = glm::degrees(glm::orientedAngle(headingVec, toPlayerVec, glm::vec3(0, 0, 1)));
 			float scalar = pow(2, fmod(abs(angle), 360) / 360) - 1;
 			if (angle < -0.01)
-				emitter.sys->sprites[i].angularForce -= 1500 * scalar;
+				emitter.sys->sprites[i].angularForce -= 1500 * agentSpeed * scalar;
 			else if (angle > 0.01)
-				emitter.sys->sprites[i].angularForce += 1500 * scalar;
+				emitter.sys->sprites[i].angularForce += 1500 * agentSpeed * scalar;
 
 			emitter.sys->sprites[i].particleEmitter.pos = emitter.sys->sprites[i].pos;
 			emitter.sys->sprites[i].particleEmitter.setVelocity(headingVec * 750);
@@ -275,8 +282,7 @@ void ofApp::update() {
 			// Update emitter particles
 			for (int j = emitter.sys->sprites[i].particleEmitter.sys->particles.size() - 1; j > -1; j--) {
 				emitter.sys->sprites[i].particleEmitter.sys->particles[j].hasImage = agentToggleSprite;
-				emitter.sys->sprites[i].particleEmitter.sys->particles[j].radius = 5;
-				
+
 				bool particleCollision = false;
 
 				for (int k = 0; k < player.verts.size(); k++) {
@@ -288,16 +294,21 @@ void ofApp::update() {
 					}
 				}
 
-				if (particleCollision) {
+				if (!emitter.sys->sprites[i].particleEmitter.sys->particles[j].hasImage) {
+					if (player.inside(emitter.sys->sprites[i].particleEmitter.sys->particles[j].position))
+						particleCollision = true;
+				}
+
+				if (particleCollision && !isDead) {
 					emitter.sys->sprites[i].particleEmitter.sys->particles.erase(emitter.sys->sprites[i].particleEmitter.sys->particles.begin() + j);
-					nEnergy--;
+					if (nEnergy > 0)
+						nEnergy--;
+						playerEnergy = nEnergy;
 					continue;
 				}
 			}
 		}
 	}
-
-
 }
 
 //--------------------------------------------------------------
@@ -308,6 +319,7 @@ void ofApp::draw() {
 	float height = background.getHeight() * scale;
 	background.draw((ofGetWidth() - width) / 2, (ofGetHeight() - height) / 2, width, height);
 
+	
 	// Draw depending on gameState (started, stopped)
 	if (gameState) {
 		endTime = ofGetElapsedTimef();
@@ -340,13 +352,13 @@ void ofApp::draw() {
 	}
 	else if (gameOver) {
 		ofSetColor(ofColor::red);
-		ofDrawBitmapString("Game Over", ofGetWidth() / 2 - 40, ofGetHeight() / 2);
-		ofDrawBitmapString("Press Space to Restart", ofGetWidth() / 2 - 80, ofGetHeight() / 2 + 20);
-
+		ofDrawBitmapString("Game Over", ofGetWidth() / 2 - 20, ofGetHeight() / 2);
+		ofDrawBitmapString("Last Record: " + ofToString(endTime - startTime), ofGetWidth() / 2 - 70, ofGetHeight() / 2 + 20);
+		ofDrawBitmapString("Press Space to Restart", ofGetWidth() / 2 - 80, ofGetHeight() / 2 + 40);
 	}
 	else {
 		ofBitmapFont font = ofBitmapFont();
-		string text = (nEnergy > 0) ? "Press Space to Start" : "Last Record: " + ofToString(endTime - startTime) + "\nPress Space to Start";
+		string text = "Press Space to Start";
 		int width = font.getBoundingBox(text, 0, 0).getWidth();
 		int height = font.getBoundingBox(text, 0, 0).getHeight();
 		ofDrawBitmapString(text, ofGetWidth() / 2 - width / 2, ofGetHeight() / 2 - height / 2);
@@ -355,8 +367,6 @@ void ofApp::draw() {
 	// Draw gui
 	if (!bHide)
 		gui.draw();
-
-
 }
 
 //--------------------------------------------------------------
@@ -386,6 +396,16 @@ void ofApp::keyPressed(int key) {
 			agentToggleSprite = false;
 			startTime = ofGetElapsedTimef();
 			playerScale = 1;
+			agentScale = 1;
+			nAgents = 1;
+			agentLifespan = 7;
+			playerEnergy = 10;
+			playerRotSpeed = 5;
+			playerSpeed = 10;
+			toggleHeadingVector = false;
+			for (int i = emitter.sys->sprites.size() - 1; i > 0; i--) {
+				emitter.sys->remove(i);
+			}
 		}
 		else if (gameState == false) {
 			gameState = true;
@@ -398,6 +418,7 @@ void ofApp::keyPressed(int key) {
 		if (!isKeyHeld) {
 			isKeyHeld = true;
 			stopTimer = 0.0f;
+			moving.setLoop(true);
 			moving.play();
 
 		}
